@@ -1,15 +1,14 @@
 import { requireSession } from '@/lib/server/auth'
 import { connectDB } from '@/lib/db'
 import HelpTicket from '@/models/HelpTicket'
-import { Card, CardContent } from '@/components/ui/card'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
 import NewTicketForm from './new-ticket-form'
 
-const STATUS_COLOR: Record<string, string> = {
-  open: 'bg-yellow-100 text-yellow-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  resolved: 'bg-green-100 text-green-800',
-  closed: 'bg-gray-100 text-gray-800',
+const STATUS_META: Record<string, { label: string; color: string; bg: string; icon: typeof Clock }> = {
+  open:        { label: 'Open',        color: 'text-yellow-700', bg: 'bg-yellow-100', icon: Clock },
+  in_progress: { label: 'In Progress', color: 'text-blue-700',   bg: 'bg-blue-100',   icon: AlertCircle },
+  resolved:    { label: 'Resolved',    color: 'text-green-700',  bg: 'bg-green-100',  icon: CheckCircle2 },
+  closed:      { label: 'Closed',      color: 'text-gray-600',   bg: 'bg-gray-100',   icon: XCircle },
 }
 
 export default async function HelpPage() {
@@ -22,10 +21,10 @@ export default async function HelpPage() {
   }>
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-5 p-4 pt-5">
       <div>
         <h1 className="text-2xl font-bold">Help & Support</h1>
-        <p className="mt-1 text-sm text-muted-foreground">We typically reply within 24 hours</p>
+        <p className="mt-0.5 text-sm text-muted-foreground">We typically reply within 24 hours</p>
       </div>
 
       <NewTicketForm />
@@ -34,36 +33,47 @@ export default async function HelpPage() {
         <div>
           <h2 className="mb-3 font-semibold">My Tickets</h2>
           <div className="space-y-3">
-            {tickets.map((ticket) => (
-              <Card key={ticket._id}>
-                <CardContent className="p-4 space-y-2">
+            {tickets.map((ticket) => {
+              const meta = STATUS_META[ticket.status] ?? STATUS_META.open
+              const Icon = meta.icon
+              return (
+                <div key={ticket._id} className="rounded-2xl border bg-white p-4 shadow-sm space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-medium text-sm">{ticket.subject}</p>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_COLOR[ticket.status] ?? ''}`}>
-                      {ticket.status.replace(/_/g, ' ')}
+                    <p className="font-semibold text-sm leading-snug flex-1 min-w-0">
+                      {ticket.subject}
+                    </p>
+                    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold ${meta.bg} ${meta.color}`}>
+                      <Icon className="h-3 w-3" />
+                      {meta.label}
                     </span>
                   </div>
+
                   <p className="text-sm text-muted-foreground">{ticket.message}</p>
+
                   {ticket.adminReply && (
-                    <div className="rounded-lg bg-muted p-3">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Admin Reply</p>
+                    <div className="rounded-xl bg-primary/5 border border-primary/15 p-3">
+                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                        Admin Reply
+                      </p>
                       <p className="text-sm">{ticket.adminReply}</p>
                     </div>
                   )}
-                  <p className="text-xs text-muted-foreground">
+
+                  <p className="text-[10px] text-muted-foreground">
                     {new Date(ticket.createdAt).toLocaleDateString('en-PH', { dateStyle: 'medium' })}
                   </p>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
 
       {tickets.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
-          <MessageCircle className="mb-3 h-10 w-10 opacity-30" />
-          <p className="text-sm">No tickets yet</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed bg-white py-12 text-center">
+          <MessageCircle className="mb-3 h-12 w-12 text-muted-foreground/30" />
+          <p className="font-medium text-muted-foreground">No tickets yet</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Submit a request above</p>
         </div>
       )}
     </div>

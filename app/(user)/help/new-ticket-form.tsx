@@ -21,7 +21,7 @@ export default function NewTicketForm() {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await apiFetch('/api/help', {
+      const res = await apiFetch('/api/help/tickets', {
         method: 'POST',
         body: JSON.stringify({ subject, message }),
       })

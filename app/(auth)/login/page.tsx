@@ -9,7 +9,10 @@ import 'react-phone-number-input/style.css'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { setTokens } from '@/lib/client/auth'
-import { WashingMachine, ArrowLeft, Loader2, ShieldCheck } from 'lucide-react'
+import { WashingMachine, ArrowLeft, Loader2, ShieldCheck, FlaskConical } from 'lucide-react'
+
+// Populated only in development via NEXT_PUBLIC_DEV_OTP in .env.local
+const DEV_OTP = process.env.NEXT_PUBLIC_DEV_OTP ?? ''
 
 type Step = 'phone' | 'otp'
 
@@ -44,10 +47,16 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!data.success) throw new Error(data.error)
-      toast.success('OTP sent!')
       setStep('otp')
       setResendCooldown(60)
-      setTimeout(() => otpRefs.current[0]?.focus(), 100)
+      if (DEV_OTP) {
+        // Auto-fill in dev mode so the developer doesn't have to type
+        setOtp(DEV_OTP)
+        toast.success(`Dev mode — OTP auto-filled: ${DEV_OTP}`)
+      } else {
+        toast.success('OTP sent!')
+        setTimeout(() => otpRefs.current[0]?.focus(), 100)
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to send OTP')
     } finally {
@@ -132,10 +141,15 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!data.success) throw new Error(data.error)
-      toast.success('New OTP sent!')
-      setOtp('')
       setResendCooldown(60)
-      otpRefs.current[0]?.focus()
+      if (DEV_OTP) {
+        setOtp(DEV_OTP)
+        toast.success(`Dev mode — OTP is still: ${DEV_OTP}`)
+      } else {
+        toast.success('New OTP sent!')
+        setOtp('')
+        otpRefs.current[0]?.focus()
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to resend OTP')
     } finally {
@@ -211,10 +225,34 @@ export default function LoginPage() {
                 </div>
                 <h1 className="text-2xl font-bold">Verify your number</h1>
                 <p className="text-sm text-muted-foreground">
-                  We sent a 6-digit code to
+                  {DEV_OTP ? 'Dev bypass — no SMS sent' : 'We sent a 6-digit code to'}
                 </p>
                 <p className="text-sm font-semibold text-foreground">{phone}</p>
               </div>
+
+              {/* ── Dev-mode banner ── */}
+              {DEV_OTP && (
+                <div className="flex items-start gap-2.5 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-3">
+                  <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-amber-800">Development mode</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      Twilio is bypassed. Use code{' '}
+                      <code className="rounded bg-amber-200 px-1 font-mono font-bold">{DEV_OTP}</code>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOtp(DEV_OTP)
+                      handleVerifyOtp(DEV_OTP)
+                    }}
+                    className="shrink-0 rounded-lg bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-600 active:scale-95 transition-transform"
+                  >
+                    Auto-fill
+                  </button>
+                </div>
+              )}
 
               {/* OTP boxes */}
               <div className="flex justify-center gap-2.5" onPaste={handleOtpPaste}>

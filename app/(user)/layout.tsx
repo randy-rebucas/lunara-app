@@ -17,7 +17,11 @@ export default async function UserLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex min-h-screen flex-col bg-muted/20">
       <UserHeader name={name} initials={initials} />
-      <main className="flex-1 pb-20">{children}</main>
+      <main className="flex-1 pb-28 sm:pb-24" style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
+        <div className="mx-auto w-full max-w-lg">
+          {children}
+        </div>
+      </main>
       <UserBottomNav />
     </div>
   )

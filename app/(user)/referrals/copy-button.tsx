@@ -2,15 +2,20 @@
 
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
 export default function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Could not copy — please copy manually')
+    }
   }
 
   return (

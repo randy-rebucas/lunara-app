@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Smartphone, CreditCard, Building2, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,11 +14,16 @@ import { apiFetch } from '@/lib/client/auth'
 
 interface Payment { _id: string; type: string; label: string; maskedNumber?: string; isDefault: boolean }
 
-const TYPE_ICONS: Record<string, string> = {
-  gcash: '💙', maya: '💚', card: '💳', bank: '🏦'
+import type { LucideIcon } from 'lucide-react'
+
+const TYPE_META: Record<string, { icon: LucideIcon; bg: string; color: string }> = {
+  gcash: { icon: Smartphone,  bg: 'bg-blue-50',   color: 'text-blue-600'  },
+  maya:  { icon: Wallet,      bg: 'bg-green-50',  color: 'text-green-600' },
+  card:  { icon: CreditCard,  bg: 'bg-purple-50', color: 'text-purple-600'},
+  bank:  { icon: Building2,   bg: 'bg-gray-100',  color: 'text-gray-600'  },
 }
 
-export default function PaymentMethodsList({ userId, payments }: { userId: string; payments: Payment[] }) {
+export default function PaymentMethodsList({ payments }: { payments: Payment[] }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [type, setType] = useState<'card' | 'gcash' | 'maya' | 'bank'>('gcash')
@@ -30,7 +35,7 @@ export default function PaymentMethodsList({ userId, payments }: { userId: strin
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await apiFetch('/api/payment-methods', {
+      const res = await apiFetch('/api/payments', {
         method: 'POST',
         body: JSON.stringify({ type, label, maskedNumber: masked || undefined }),
       })
@@ -50,7 +55,7 @@ export default function PaymentMethodsList({ userId, payments }: { userId: strin
 
   async function handleDelete(id: string) {
     try {
-      const res = await apiFetch(`/api/payment-methods/${id}`, { method: 'DELETE' })
+      const res = await apiFetch(`/api/payments/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (!data.success) throw new Error(data.error)
       router.refresh()
@@ -61,21 +66,25 @@ export default function PaymentMethodsList({ userId, payments }: { userId: strin
 
   return (
     <div className="space-y-3">
-      {payments.map((pm) => (
-        <div key={pm._id} className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">{TYPE_ICONS[pm.type] ?? '💳'}</span>
-            <div>
+      {payments.map((pm) => {
+        const meta = TYPE_META[pm.type] ?? TYPE_META.card
+        const Icon = meta.icon
+        return (
+          <div key={pm._id} className="flex items-center gap-3">
+            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${meta.bg}`}>
+              <Icon className={`h-4.5 w-4.5 ${meta.color}`} strokeWidth={1.5} />
+            </div>
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">{pm.label}</p>
               {pm.maskedNumber && <p className="text-xs text-muted-foreground">{pm.maskedNumber}</p>}
             </div>
             {pm.isDefault && <Badge variant="secondary" className="text-xs">Default</Badge>}
+            <Button variant="ghost" size="icon" className="shrink-0" onClick={() => handleDelete(pm._id)}>
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => handleDelete(pm._id)}>
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
-      ))}
+        )
+      })}
 
       <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => setOpen(true)}>
         <Plus className="mr-2 h-4 w-4" />Add Payment Method

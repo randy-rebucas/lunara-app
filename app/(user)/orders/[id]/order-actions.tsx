@@ -30,7 +30,11 @@ export default function OrderActions({ orderId }: { orderId: string }) {
 
   return (
     <>
-      <Button variant="destructive" className="w-full" onClick={() => setOpen(true)}>
+      <Button
+        variant="outline"
+        className="h-12 w-full rounded-xl border-primary bg-white text-sm font-extrabold text-primary hover:bg-blue-50 hover:text-primary"
+        onClick={() => setOpen(true)}
+      >
         Cancel Order
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>

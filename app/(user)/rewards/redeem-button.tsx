@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { apiFetch } from '@/lib/client/auth'
 
-export default function RedeemButton({ rewardId, title, pointsRequired }: {
-  rewardId: string; title: string; pointsRequired: number
+export default function RedeemButton({ rewardId, title, pointsRequired, disabled = false }: {
+  rewardId: string; title: string; pointsRequired: number; disabled?: boolean
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -36,8 +36,13 @@ export default function RedeemButton({ rewardId, title, pointsRequired }: {
 
   return (
     <>
-      <Button size="sm" className="w-full" onClick={() => setOpen(true)}>
-        Redeem for {pointsRequired} pts
+      <Button
+        size="sm"
+        className="h-7 w-full rounded-full px-2 text-[10px] font-extrabold"
+        onClick={() => setOpen(true)}
+        disabled={disabled}
+      >
+        {disabled ? 'Locked' : 'Redeem'}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
