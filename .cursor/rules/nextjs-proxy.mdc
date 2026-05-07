@@ -1,0 +1,26 @@
+---
+description: Next.js middleware convention for this project
+alwaysApply: true
+---
+
+# Use `proxy.ts`, not `middleware.ts`
+
+This project uses **Next.js 16+**, which replaced `middleware.ts` with `proxy.ts`.
+
+- **NEVER create or edit `middleware.ts`** — it will cause a build error.
+- **ALL middleware logic** (auth guards, CORS, token refresh, redirects) must live in `proxy.ts` at the project root.
+- The exported entry-point is `proxy` (not `middleware`):
+
+```ts
+// ✅ GOOD — proxy.ts
+export async function proxy(req: NextRequest) { ... }
+export const config = { matcher: [...] }
+
+// ❌ BAD — middleware.ts (do not create)
+export async function middleware(req: NextRequest) { ... }
+```
+
+Current `proxy.ts` handles:
+1. CORS pre-flight for `/api/*` routes.
+2. Auth guard + silent JWT refresh for `/admin/*` and user-facing protected routes.
+3. Public paths (never redirected): `/login`, `/signup`, `/admin/login`, `/admin-login`.

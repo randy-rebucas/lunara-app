@@ -27,6 +27,7 @@ export interface IAddress {
 
 export interface IOrder extends Document {
   user: Types.ObjectId
+  driver?: Types.ObjectId
   items: IOrderItem[]
   status: OrderStatus
   pickupAddress: IAddress
@@ -56,6 +57,7 @@ const AddressSchema = new Schema<IAddress>(
 const OrderSchema = new Schema<IOrder>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    driver: { type: Schema.Types.ObjectId, ref: 'User' },
     items: [
       {
         service: { type: String, required: true },
@@ -85,6 +87,12 @@ const OrderSchema = new Schema<IOrder>(
 )
 
 OrderSchema.index({ user: 1, createdAt: -1 })
+OrderSchema.index({ driver: 1, status: 1 })
 OrderSchema.index({ status: 1 })
 
-export default mongoose.models.Order ?? mongoose.model<IOrder>('Order', OrderSchema)
+// Always re-register so schema additions (e.g. new fields) are picked up
+// across hot reloads in development without needing a server restart.
+if (mongoose.models.Order) {
+  delete (mongoose.models as Record<string, unknown>).Order
+}
+export default mongoose.model<IOrder>('Order', OrderSchema)

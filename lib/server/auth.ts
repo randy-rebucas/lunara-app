@@ -20,7 +20,8 @@ export async function requireSession(): Promise<JWTPayload> {
 }
 
 export async function requireAdmin(): Promise<JWTPayload> {
-  const session = await requireSession()
+  const session = await getSession()
+  if (!session) redirect('/admin/login')
   if (session.role !== 'admin') redirect('/dashboard')
   return session
 }

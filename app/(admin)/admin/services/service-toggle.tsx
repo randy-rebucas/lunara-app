@@ -28,9 +28,14 @@ export default function ServiceToggle({ serviceId, isActive }: { serviceId: stri
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={handleToggle} disabled={loading}
-      className={isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'}>
-      {loading ? '…' : isActive ? 'Deactivate' : 'Activate'}
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleToggle}
+      disabled={loading}
+      className={`h-8 px-2 text-xs ${isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'}`}
+    >
+      {loading ? '…' : isActive ? 'Disable' : 'Enable'}
     </Button>
   )
 }

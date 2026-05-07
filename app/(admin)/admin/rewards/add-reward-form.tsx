@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { apiFetch } from '@/lib/client/auth'
 
 export default function AddRewardForm() {
@@ -46,7 +46,10 @@ export default function AddRewardForm() {
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add Reward</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Add Reward</DialogTitle>
+            <DialogDescription className="sr-only">Create a new loyalty reward that customers can redeem with their points.</DialogDescription>
+          </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
               <Label>Title</Label>
