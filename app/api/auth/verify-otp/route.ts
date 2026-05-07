@@ -17,7 +17,13 @@ async function handleVerifyOtp(
 ): Promise<NextResponse> {
   await connectDB()
 
-  const approved = await checkOtpVerification(body.phone, body.otp)
+  let approved: boolean
+  try {
+    approved = await checkOtpVerification(body.phone, body.otp)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to verify OTP'
+    return NextResponse.json({ success: false, error: message }, { status: 503 })
+  }
   if (!approved) {
     return NextResponse.json({ success: false, error: 'Invalid or expired OTP' }, { status: 400 })
   }

@@ -13,8 +13,13 @@ async function handleSendOtp(
   body: SendOtpInput
 ): Promise<NextResponse> {
   await connectDB()
-  await sendOtpVerification(body.phone)
-  return NextResponse.json({ success: true, message: 'OTP sent successfully' })
+  try {
+    await sendOtpVerification(body.phone)
+    return NextResponse.json({ success: true, message: 'OTP sent successfully' })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to send OTP'
+    return NextResponse.json({ success: false, error: message }, { status: 503 })
+  }
 }
 
 export const POST = withRateLimit(withValidation(sendOtpSchema, handleSendOtp), {

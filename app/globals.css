@@ -120,3 +120,51 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* ── react-phone-number-input ─────────────────────────────────────── */
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+  background: hsl(var(--background));
+  padding: 0 0.75rem;
+  height: 2.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.phone-input-wrapper:focus-within {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+  outline: none;
+}
+.phone-input-wrapper .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.phone-input-wrapper .PhoneInputCountrySelect {
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  color: hsl(var(--foreground));
+}
+.phone-input-wrapper .PhoneInputCountrySelectArrow {
+  opacity: 0.4;
+}
+.phone-input-wrapper .phone-number-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.875rem;
+  color: hsl(var(--foreground));
+  min-width: 0;
+}
+.phone-input-wrapper .phone-number-input::placeholder {
+  color: hsl(var(--muted-foreground));
+}

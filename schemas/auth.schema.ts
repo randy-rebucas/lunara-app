@@ -14,7 +14,8 @@ export const loginSchema = z.object({
 })
 
 export const sendOtpSchema = z.object({
-  phone: z.string().regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number'),
+  // E.164 format required: +[country code][number], 8–15 digits after +
+  phone: z.string().regex(/^\+[1-9]\d{7,14}$/, 'Invalid phone number — must be in international format (e.g. +639171234567)'),
 })
 
 export const verifyOtpSchema = z.object({
