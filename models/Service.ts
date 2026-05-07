@@ -27,7 +27,6 @@ const ServiceSchema = new Schema<IService>(
   { timestamps: true }
 )
 
-ServiceSchema.index({ slug: 1 })
 ServiceSchema.index({ isActive: 1, sortOrder: 1 })
 
 export default mongoose.models.Service ?? mongoose.model<IService>('Service', ServiceSchema)
